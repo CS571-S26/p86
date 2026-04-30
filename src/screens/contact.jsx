@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+
+import ContactForm from '../components/contact/ContactForm';
+import ContactConfirmModal from '../components/contact/ContactConfirmModal';
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -8,8 +11,12 @@ export default function Contact() {
         message: ''
     });
 
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState('');
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -18,53 +25,52 @@ export default function Contact() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setShowConfirmModal(true);
+    };
+
+    const handleConfirmSubmit = () => {
         console.log('Form submitted:', formData);
         setFormData({ name: '', email: '', message: '' });
+        setShowConfirmModal(false);
+        setSuccessMessage('Your message has been submitted!');
     };
 
     return (
-        <Container style={{ maxWidth: '600px', marginTop: '30px' }}>
-            <h1 className="mb-4">Contact Us</h1>
+        <Container className="mt-4 contact-page">
+            <Row className="justify-content-center">
+                <Col md={10} lg={8}>
+                    <h1 className="mb-3 travel-page-title">Contact Me</h1>
 
-            <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="name">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
+                    <p className="travel-subtitle mb-4">
+                        Have a question, suggestion, or travel recommendation? Send me a message below!
+                    </p>
 
-                <Form.Group className="mb-3" controlId="email">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
+                    <Card className="mb-4 blog-card">
+                        <Card.Body>
+                            <Card.Title className="mb-3">Send a Message</Card.Title>
 
-                <Form.Group className="mb-3" controlId="message">
-                    <Form.Label>Message</Form.Label>
-                    <Form.Control
-                        as="textarea"
-                        rows={5}
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
+                            <ContactForm
+                                formData={formData}
+                                onChange={handleChange}
+                                onSubmit={handleSubmit}
+                            />
 
-                <Button variant="primary" type="submit">
-                    Send Message
-                </Button>
-            </Form>
+                            {successMessage && (
+                                <p role="status" className="text-success mt-3 mb-0">
+                                    {successMessage}
+                                </p>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            <ContactConfirmModal
+                show={showConfirmModal}
+                formData={formData}
+                onCancel={() => setShowConfirmModal(false)}
+                onConfirm={handleConfirmSubmit}
+            />
         </Container>
     );
 }
